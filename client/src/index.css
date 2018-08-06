@@ -1,0 +1,33 @@
+* {
+	margin: 0;
+	box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+	text-decoration: none;
+	transition: 0.5s ease color;
+}
+
+a:hover {
+	color: black;
+  text-decoration: underline;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	color: black;
+  font-weight: normal;
+}
+
+body {
+	background: #F4EBD9;
+	color: #483D3F;
+	font-size: 14px;
+  margin: 0 auto;
+	max-width: 600px;
+  padding: 20px;
+}
+
+body, input, textarea {
+	font-family: 'Open Sans', sans-serif;
+}

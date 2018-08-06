@@ -1,0 +1,12 @@
+.post {
+  margin-top: 20px;
+}
+
+.post p {
+  margin: 10px 0;
+}
+
+.post img {
+  max-width: 100%;
+  margin-top: 10px;
+}

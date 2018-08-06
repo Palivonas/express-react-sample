@@ -1,0 +1,58 @@
+.navigation {
+  color: #2c3e50;
+  display: flex;
+  height: 100%;
+  margin-top: 20px;
+}
+
+.navigation a {
+  display: block;
+  font-size: 18px;
+  text-transform: uppercase;
+}
+.navigation a:not(:last-child) {
+  margin-right: 15px;
+}
+
+.message {
+	text-align: center;
+	margin: 2em 0;
+}
+
+form section {
+	display: block;
+	margin: 15px 0;
+}
+
+form input, form textarea {
+	border: 1px solid #77685D;
+	border-radius: 2px;
+	display: block;
+	font-size: 1.3em;
+	max-width: 100%;
+	min-width: 100%;
+	padding: 4px;
+}
+
+form textarea {
+	font-size: 1em;
+	min-height: 4.1em;
+}
+
+form button {
+	background: #058ED9;
+	border: 1px solid transparent;
+	border-radius: 2px;
+	color: #F4EBD9;
+	font-size: 1.2em;
+	letter-spacing: 0.05em;
+	padding: 8px 10px;
+	text-transform: uppercase;
+	transition: 0.5s ease all;
+}
+
+form button:hover:not([disabled]) {
+	background: #0b7db9;
+	border-color: #483D3F;
+	cursor: pointer;
+}
