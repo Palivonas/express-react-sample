@@ -1,15 +1,19 @@
+const _ = require('lodash');
 const { posts } = require('./inMemory');
 
 module.exports = {
-	async find() {
-		return posts.slice()
-			.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+	async find({ authorId } = {}) {
+		let result = _.sortBy(posts, (post) => -new Date(post.createdAt).getTime());
+		if (authorId) {
+			result = result.filter((p) => p.authorId === authorId);
+		}
+		return result;
 	},
 	async get(id) {
-		return posts.find((post) => post.id === id);
+		return _.find(posts, { id });
 	},
 	async create(post) {
-		const id = (posts.length && (parseInt(posts[posts.length - 1].id, 10) + 1).toString()) || '1';
+		const id = (posts.length && (parseInt(_.findLast(posts).id, 10) + 1).toString()) || '1';
 		const newPost = {
 			...post,
 			createdAt: new Date().toISOString(),
@@ -19,11 +23,7 @@ module.exports = {
 		return newPost;
 	},
 	async delete(id) {
-		const index = posts.findIndex((post) => post.id === id);
-		if (index === -1) {
-			return false;
-		}
-		posts.splice(index, 1);
-		return true;
+		const [ deleted ] = _.remove(posts, { id });
+		return !!deleted;
 	},
 };

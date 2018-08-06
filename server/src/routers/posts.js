@@ -26,11 +26,16 @@ router.post('/', protect, async (req, res) => {
 });
 
 router.delete('/:id', protect, async (req, res) => {
-	const deleted = await Post.delete(req.params.id);
-	if (!deleted) {
+	const post = await Post.get(req.params.id);
+	if (!post) {
 		res.sendStatus(404);
 		return;
 	}
+	if (post.authorId !== req.user.id) {
+		res.sendStatus(403);
+		return;
+	}
+	await Post.delete(post.id);
 	res.sendStatus(204);
 });
 

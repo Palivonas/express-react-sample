@@ -6,6 +6,7 @@ const mockPosts = require('./mockPosts');
 const mockUsers = require('./mockUsers');
 
 let authorization = null;
+let authorization2 = null;
 let userId = null;
 
 describe('Users and auth', () => {
@@ -18,6 +19,24 @@ describe('Users and auth', () => {
 				name: mockUsers[0].name,
 				id: '1',
 			})
+			.end(done);
+	});
+	it('should authenticate user1', (done) => {
+		request(app)
+			.post('/api/auth')
+			.send({ email: mockUsers[0].email, password: mockUsers[0].password })
+			.expect(200)
+			.expect(({ body }) => {
+				expect(body.token).to.be.a('string').and.not.be.empty;
+				authorization2 = `Bearer ${body.token}`;
+			})
+			.end(done);
+	});
+	it('should not create a user with duplicate email', (done) => {
+		request(app)
+			.post('/api/users')
+			.send(mockUsers[0])
+			.expect(409)
 			.end(done);
 	});
 	it('should create another user', (done) => {
@@ -51,7 +70,7 @@ describe('Users and auth', () => {
 			.expect(401)
 			.end(done);
 	});
-	it('should authenticate', (done) => {
+	it('should authenticate user2', (done) => {
 		request(app)
 			.post('/api/auth')
 			.send({ email: mockUsers[1].email, password: mockUsers[1].password })
@@ -134,6 +153,13 @@ describe('Posts', () => {
 			.expect(401)
 			.end(done);
 	});
+	it('should not delete a post by another author', (done) => {
+		request(app)
+			.delete('/api/posts/2')
+			.set('Authorization', authorization2)
+			.expect(403)
+			.end(done);
+	});
 	it('should delete a post', (done) => {
 		request(app)
 			.delete('/api/posts/2')
@@ -153,6 +179,19 @@ describe('Posts', () => {
 			.expect(({ body }) => {
 				expect(body).to.have.lengthOf(1);
 			})
+			.end(done);
+	});
+	it('should delete user', (done) => {
+		request(app)
+			.delete('/api/users/2')
+			.set('Authorization', authorization)
+			.expect(204)
+			.end(done);
+	});
+	it('should have deleted user posts as well', (done) => {
+		request(app)
+			.get('/api/posts')
+			.expect([])
 			.end(done);
 	});
 });

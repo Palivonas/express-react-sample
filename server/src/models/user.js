@@ -1,15 +1,16 @@
 const { users } = require('./inMemory');
+const _ = require('lodash');
 
 module.exports = {
-	async find({ email }) {
-		let result = users;
+	async find({ email } = {}) {
+		let results = users;
 		if (email) {
-			result = result.filter((user) => user.email === email);
+			results = _.filter(results, { email });
 		}
-		return result;
+		return results;
 	},
 	async get(id) {
-		return users.find((user) => user.id === id);
+		return _.find(users, { id });
 	},
 	async create(user) {
 		const exists = users.some((u) => u.email === user.email);
@@ -18,7 +19,7 @@ module.exports = {
 			error.code = 'duplicate_data';
 			throw error;
 		}
-		const id = (users.length && (parseInt(users[users.length - 1].id, 10) + 1).toString()) || '1';
+		const id = (users.length && (parseInt(_.findLast(users).id, 10) + 1).toString()) || '1';
 		const newUser = {
 			...user,
 			id,
