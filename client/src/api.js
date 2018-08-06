@@ -14,8 +14,14 @@ axios.interceptors.response.use((response) => response, (error) => {
 	throw error;
 });
 
+const cache = {
+	posts: new Map(),
+	authenticated: false,
+};
+
 const setToken = (token) => {
 	storage.setItem('token', token);
+	cache.authenticated = true;
 	axios.defaults.headers.common.Authorization = `Bearer ${token}`;
 };
 
@@ -24,10 +30,6 @@ const checkTokenStorage = () => {
 	if (token) {
 		setToken(token);
 	}
-};
-
-const cache = {
-	posts: new Map(),
 };
 
 const api = {
@@ -68,6 +70,9 @@ const api = {
 		},
 	},
 	checkTokenStorage,
+	isAuthenticated() {
+		return cache.authenticated;
+	}
 };
 
 export default api;
