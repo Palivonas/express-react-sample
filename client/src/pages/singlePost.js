@@ -7,7 +7,7 @@ class SinglePost extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			id: props.match.params.id,
+			id: parseInt(props.match.params.id, 10),
 			post: null,
 		};
 	}

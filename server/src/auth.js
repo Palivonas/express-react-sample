@@ -14,11 +14,11 @@ const middleware = {
 		}
 		try {
 			const payload = decode(token);
-			const user = await User.get(payload.userId);
+			const user = await User.findById(payload.userId);
 			if (!user) {
 				throw new Error('User not found');
 			}
-			req.user = user;
+			req.user = user.toJSON();
 			next();
 		} catch (err) {
 			res.status(401).json({ error: 'token_invalid' });

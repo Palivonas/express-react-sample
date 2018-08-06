@@ -1,14 +1,12 @@
 [
 	{
-		"id": "1",
+		"id": 1,
 		"title": "Hello world",
-		"content": "Bye bugs... I hope?",
-		"authorId": "2"
+		"content": "Bye bugs... I hope?"
 	},
 	{
-		"id": "2",
+		"id": 2,
 		"title": "Meaning of life",
-		"content": "It is and has always been 42",
-		"authorId": "2"
+		"content": "It is and has always been 42"
 	}
 ]

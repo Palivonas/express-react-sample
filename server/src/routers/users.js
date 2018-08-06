@@ -13,22 +13,22 @@ const hash = (password) => {
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-	const query = {};
+	const where = {};
 	if (req.params.email) {
-		query.email = req.params.email;
+		where.email = req.params.email;
 	}
-	const users = (await User.find(query))
-		.map((user) => _.omit(user, 'password'));
+	const users = (await User.findAll({ where }))
+		.map((user) => _.omit(user.toJSON(), 'password'));
 	res.json(users);
 });
 
 router.get('/:id', async (req, res) => {
-	const user = await User.get(req.params.id);
+	const user = await User.findById(req.params.id);
 	if (!user) {
 		res.sendStatus(404);
 		return;
 	}
-	res.json(_.omit(user, 'password'));
+	res.json(_.omit(user.toJSON(), 'password'));
 });
 
 router.post('/', async (req, res) => {
@@ -53,33 +53,34 @@ router.post('/', async (req, res) => {
 	try {
 		const user = await User.create({ email, name, password });
 		res.status(201);
-		res.json(_.omit(user, 'password'));
+		res.json(_.omit(user.toJSON(), 'password'));
+		return;
 	} catch (err) {
-		if (err.code !== 'duplicate_data') {
-			res.sendStatus(500);
+		if (err.name !== 'SequelizeUniqueConstraintError') {
+			res.status(500).json({ error: 'unknown_error' });
 			return;
 		}
-		res.sendStatus(409);
+		res.status(409).json({ errors: [ 'email' ] });
 	}
 });
 
 router.delete('/:id', protect, async (req, res) => {
-	if (req.params.id !== req.user.id) {
+	if (parseInt(req.params.id, 10) !== req.user.id) {
 		res.sendStatus(403);
 		return;
 	}
-	const deleted = await User.delete(req.params.id);
-	if (!deleted) {
+	const user = await User.findById(req.params.id);
+	if (!user) {
 		res.sendStatus(404);
 		return;
 	}
 
 	// GDPR intesifies...
-	const userPosts = await Post.find({ authorId: req.user.id });
-	for (const post of userPosts) {
-		// not using Promise.all() because the mock in-memory mock database doesn't handle concurrency
-		await Post.delete(post.id);
-	}
+	const userPosts = await Post.findAll({ where: { authorId: user.get('id') } });
+	const postIds = userPosts.map((post) => post.get('id'));
+	await Post.destroy({ where: { id: postIds } });
+	await user.destroy();
+
 	res.sendStatus(204);
 });
 

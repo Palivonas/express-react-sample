@@ -6,7 +6,7 @@ const { sign } = require('../auth');
 const router = express.Router();
 
 router.post('/', async (req, res) => {
-	const user = (await User.find({ email: req.body.email }))[0];
+	let user = await User.findOne({ where: { email: req.body.email } });
 	const valid = !!user && verifyPassword(req.body.password, user.password);
 	if (!valid) {
 		res.sendStatus(401);

@@ -5,6 +5,7 @@ const compression = require('compression');
 const nocache = require('nocache');
 const path = require('path');
 
+const models = require('./models');
 const { parseUser } = require('./auth').middleware;
 
 const postsRouter = require('./routers/posts');
@@ -31,4 +32,13 @@ app.use('*', (req, res) => {
 	res.sendFile(path.join(__dirname, '../../client/build/index.html'));
 });
 
-module.exports = app;
+module.exports = {
+	async init({ storage } = {}) {
+		if (storage) {
+			const db = require('./models/db');
+			db.options.storage = storage;
+		}
+		await models.sync();
+	},
+	expressApp: app,
+};

@@ -6,6 +6,7 @@ class Login extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			name: '',
 			email: '',
 			password: '',
 			loading: false,
@@ -16,8 +17,8 @@ class Login extends Component {
 	async submit() {
 		this.setState({ loading: true, error: false });
 		try {
-			const { email, password } = this.state;
-			await api.users.create({ email, password });
+			const { name, email, password } = this.state;
+			await api.users.create({ name, email, password });
 			await api.auth.create({ email, password });
 			this.redirect('/');
 		} catch (err) {
@@ -35,6 +36,14 @@ class Login extends Component {
 						type="email"
 						required
 						autoFocus
+					/>
+				</section>
+				<section>
+					<input
+						onChange={ (event) => this.setState({ name: event.target.value }) }
+						disabled={ this.state.loading }
+						placeholder="Name"
+						required
 					/>
 				</section>
 				<section>
