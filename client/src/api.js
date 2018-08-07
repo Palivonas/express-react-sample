@@ -6,23 +6,18 @@ const axios = Axios.create({
 
 const storage = window.localStorage; // abstract for easier SSR implementation later
 
-axios.interceptors.response.use((response) => response, (error) => {
-	if (error.response.status === 401 && error.response.data.error === 'token_invalid') {
-		storage.removeItem('token');
-		window.location.assign('/');
-	}
-	throw error;
-});
-
-const cache = {
-	posts: new Map(),
-	authenticated: false,
-};
+let authenticated = false;
 
 const setToken = (token) => {
 	storage.setItem('token', token);
-	cache.authenticated = true;
+	authenticated = true;
 	axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+};
+
+const clearToken = () => {
+	storage.removeItem('token');
+	authenticated = false;
+	delete axios.defaults.headers.common.Authorization;
 };
 
 const checkTokenStorage = () => {
@@ -32,25 +27,23 @@ const checkTokenStorage = () => {
 	}
 };
 
+axios.interceptors.response.use((response) => response, (error) => {
+	if (error.response.status === 401 && error.response.data.error === 'token_invalid') {
+		clearToken();
+	}
+	throw error;
+});
+
 const api = {
 	posts: {
 		async find() {
-			const posts = (await axios.get('/posts')).data;
-			posts.forEach((post) => cache.posts.set(post.id, post));
-			return posts;
+			return (await axios.get('/posts')).data;
 		},
 		async get(id) {
-			let post = cache.posts.get(id);
-			if (!post) {
-				post = (await axios.get(`/posts/${encodeURIComponent(id)}`)).data;
-				cache.posts.set(post.id, post);
-			}
-			return post;
+			return (await axios.get(`/posts/${encodeURIComponent(id)}`)).data;
 		},
 		async create(data) {
-			const post = (await axios.post('/posts', data)).data;
-			cache.posts.set(post.id, post);
-			return post;
+			return (await axios.post('/posts', data)).data;
 		},
 		async delete(id) {
 			return (await axios.delete(`/posts/${encodeURIComponent(id)}`)).data;
@@ -61,6 +54,9 @@ const api = {
 			const user = (await axios.post('/users', data)).data;
 			return user;
 		},
+		async getAuthenticated() {
+			return (await axios.get('/users/me')).data;
+		},
 	},
 	auth: {
 		async create(credentials) {
@@ -68,10 +64,13 @@ const api = {
 			setToken(token);
 			return token;
 		},
+		async logout() {
+			clearToken();
+		},
 	},
 	checkTokenStorage,
-	isAuthenticated() {
-		return cache.authenticated;
+	get isAuthenticated() {
+		return authenticated;
 	}
 };
 

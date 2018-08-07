@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import api from '../api';
+import { view } from 'react-easy-state';
+import { Redirect } from 'react-router-dom';
+import store from '../store';
 
 class CreatePost extends Component {
 	constructor(props) {
@@ -10,22 +11,17 @@ class CreatePost extends Component {
 			content: '',
 			loading: false,
 			error: false,
+			post: null,
 		};
-		this.redirect = (to) => props.history.push(to);
-	}
-	componentDidMount() {
-		if (!api.isAuthenticated()) {
-			this.redirect('/login');
-		}
 	}
 	async submit() {
 		this.setState({ loading: true, error: false });
 		try {
-			const post = await api.posts.create({
+			const post = await store.createPost({
 				title: this.state.title,
 				content: this.state.content,
 			});
-			this.redirect(`/posts/${encodeURIComponent(post.id)}`);
+			this.setState({ post });
 		} catch (err) {
 			this.setState({ error: true, loading: false });
 		}
@@ -33,6 +29,8 @@ class CreatePost extends Component {
 	render() {
 		return (
 			<form onSubmit={ (e) => { e.preventDefault(); this.submit(); } }>
+				{ !store.user && <Redirect to="/" />}
+				{ this.state.post && <Redirect to={ `/posts/${encodeURIComponent(this.state.post.id)}` } />}
 				<section>
 					<input
 						onChange={ (event) => this.setState({ title: event.target.value }) }
@@ -65,8 +63,4 @@ class CreatePost extends Component {
 	}
 }
 
-CreatePost.propTypes = {
-	history: PropTypes.object.isRequired,
-};
-
-export default CreatePost;
+export default view(CreatePost);

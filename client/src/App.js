@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
 import './App.css';
 
+import Header from './components/header';
 import PostList from './pages/postList';
 import SinglePost from './pages/singlePost';
 import Login from './pages/login';
@@ -13,13 +14,7 @@ class App extends Component {
 		return (
 			<div>
 				<h1 className="site-title"><Link to="/"><em>The</em> Blog</Link></h1>
-
-				<header className="navigation">
-					<Link to="/">Home</Link>
-					<Link to="/login">Login</Link>
-					<Link to="/register">Register</Link>
-					<Link to="/create">New post</Link>
-				</header>
+				<Header />
 				<Switch>
 					<Route exact path="/" component={PostList} />
 					<Route path="/posts/:id" component={SinglePost} />

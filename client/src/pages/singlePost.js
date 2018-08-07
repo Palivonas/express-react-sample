@@ -1,25 +1,30 @@
 import React, { Component } from 'react';
+import { view } from 'react-easy-state';
 import PropTypes from 'prop-types';
 import Post from '../components/post';
-import api from '../api';
+import store from '../store';
 
 class SinglePost extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			id: parseInt(props.match.params.id, 10),
-			post: null,
-		};
+	get postId() {
+		return this.props.match.params.id;
 	}
-	async componentDidMount() {
-		const post = await api.posts.get(this.state.id);
-		this.setState({ post });
+	componentDidMount() {
+		if (store.postsKeyed[this.postId]) {
+			return;
+		}
+		store.fetchPost(this.postId);
+	}
+	componentDidUpdate(prevProps) {
+		if (this.postId === prevProps.match.params.id) {
+			return;
+		}
+		store.componentDidMount();
 	}
 	render() {
 		return (
-			this.state.post
+			store.postsKeyed[this.postId]
 				?
-				<Post post={this.state.post} />
+				<Post post={store.postsKeyed[this.postId]} />
 				:
 				<h3 className="message">Loading post...</h3>
 		);
@@ -34,4 +39,4 @@ SinglePost.propTypes = {
 	}),
 };
 
-export default SinglePost;
+export default view(SinglePost);

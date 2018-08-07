@@ -4,14 +4,14 @@ import { BrowserRouter } from 'react-router-dom';
 import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
-import api from './api';
+import store from './store';
 
-api.checkTokenStorage();
-
-ReactDOM.render((
-	<BrowserRouter>
-		<App/>
-	</BrowserRouter>
-), document.getElementById('root'));
+store.authenticate()
+	.catch((err) => {
+		window.console.error(err);
+	})
+	.then(() => {
+		ReactDOM.render(<BrowserRouter><App /></BrowserRouter>, document.getElementById('root'));
+	});
 
 registerServiceWorker();

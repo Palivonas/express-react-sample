@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import { Redirect } from 'react-router-dom';
+import { view } from 'react-easy-state';
 import api from '../api';
+import store from '../store';
 
 class Login extends Component {
 	constructor(props) {
@@ -12,15 +14,13 @@ class Login extends Component {
 			loading: false,
 			error: false,
 		};
-		this.redirect = (to) => props.history.push(to);
 	}
 	async submit() {
 		this.setState({ loading: true, error: false });
 		try {
 			const { name, email, password } = this.state;
 			await api.users.create({ name, email, password });
-			await api.auth.create({ email, password });
-			this.redirect('/');
+			await store.authenticate({ email, password });
 		} catch (err) {
 			this.setState({ error: true, loading: false });
 		}
@@ -28,6 +28,7 @@ class Login extends Component {
 	render() {
 		return (
 			<form onSubmit={ (e) => { e.preventDefault(); this.submit(); } }>
+				{ store.user && <Redirect to="/" />}
 				<section>
 					<input
 						onChange={ (event) => this.setState({ email: event.target.value }) }
@@ -70,8 +71,4 @@ class Login extends Component {
 	}
 }
 
-Login.propTypes = {
-	history: PropTypes.object.isRequired,
-};
-
-export default Login;
+export default view(Login);

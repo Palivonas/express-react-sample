@@ -1,38 +1,31 @@
 import React, { Component } from 'react';
+import { view } from 'react-easy-state';
 import Post from '../components/post';
-import api from '../api';
+import store from '../store';
 
-const truncate = (text, length) => {
-	if (text.length <= length) {
-		return text;
+const truncateContent = (post) => {
+	const length = 250;
+	if (post.content.length <= length) {
+		return post;
 	}
-	return `${text.slice(0, length - 3)}...`;
+	return {
+		...post,
+		content: `${post.content.slice(0, length - 3)}...`,
+	};
 };
 
 class PostList extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			loaded: false,
-			posts: [],
-		};
-	}
 	async componentDidMount() {
-		const posts = (await api.posts.find())
-			.map((post) => ({
-				...post,
-				content: truncate(post.content, 250),
-			}));
-		this.setState({ posts, loaded: true });
+		await store.fetchPosts();
 	}
 	render() {
 		return (
-			this.state.loaded
+			store.postsLoaded
 				?
-				(this.state.posts.length === 0 ?
+				(store.posts.length === 0 ?
 					<h3 className="message">No posts here. How about creating one?</h3>
 					:
-					this.state.posts.map((post) => (
+					store.posts.map(truncateContent).map((post) => (
 						<Post post={post} key={post.id} />
 					))
 				)
@@ -42,4 +35,4 @@ class PostList extends Component {
 	}
 }
 
-export default PostList;
+export default view(PostList);
