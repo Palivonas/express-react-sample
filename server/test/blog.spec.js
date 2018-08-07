@@ -39,6 +39,17 @@ describe('Users and auth', () => {
 			})
 			.end(done);
 	});
+	it('should get /me', (done) => {
+		request(expressApp)
+			.get('/api/users/me')
+			.set('Authorization', authorization)
+			.expect(200)
+			.expect(({ body }) => {
+				expect(body.email).to.equal(mockUsers[0].email);
+				expect(body.name).to.equal(mockUsers[0].name);
+			})
+			.end(done);
+	});
 	it('should not create a user with duplicate email', (done) => {
 		request(expressApp)
 			.post('/api/users')

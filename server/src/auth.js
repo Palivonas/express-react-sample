@@ -19,6 +19,7 @@ const middleware = {
 				throw new Error('User not found');
 			}
 			req.user = user.toJSON();
+			delete req.user.password;
 			next();
 		} catch (err) {
 			res.status(401).json({ error: 'token_invalid' });
