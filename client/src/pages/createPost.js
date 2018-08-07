@@ -40,6 +40,7 @@ class CreatePost extends Component {
 					/>
 				</section>
 				<section>
+					<small>Markdown is supported</small>
 					<textarea
 						onChange={ (event) => this.setState({ content: event.target.value }) }
 						disabled={ this.state.loading }
