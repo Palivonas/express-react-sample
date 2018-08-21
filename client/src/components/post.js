@@ -21,7 +21,6 @@ const Post = ({ post }) => (
 
 Post.propTypes = {
 	post: PropTypes.object.isRequired,
-	truncate: PropTypes.bool,
 };
 
 export default Post;

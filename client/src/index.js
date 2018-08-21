@@ -6,6 +6,7 @@ import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import store from './store';
 
+// a workaround to make sure user is authenticated before checking it in permission logic
 store.authenticate()
 	.catch((err) => {
 		window.console.error(err);

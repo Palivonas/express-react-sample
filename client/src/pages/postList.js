@@ -15,8 +15,8 @@ const truncateContent = (post) => {
 };
 
 class PostList extends Component {
-	async componentDidMount() {
-		await store.fetchPosts();
+	componentDidMount() {
+		store.fetchPosts();
 	}
 	render() {
 		return (
